@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <title>HW4</title>
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
+    
+    <title>Live Streaming</title>
+    
+    
+</head>
+<body>
+    
+    
+    <div id="video_container">
+        <video id="videoplayer" src="{{ url_for('static',filename='data/result_0_dash.mpd') }}" data-dashjs-player autoplay controls></video>
+    </div>
+    <script src="{{ url_for('static',filename='js/dash.all.min.js') }}"></script>
+    
+</body>

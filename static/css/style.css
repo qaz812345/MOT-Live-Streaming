@@ -1,0 +1,17 @@
+body{
+    height: 100%;
+    margin: 0px;
+    overflow: hidden;
+}
+
+#player{
+    width: 720;
+    height: 640;
+    vertical-align: middle;
+}
+
+#video_container{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}

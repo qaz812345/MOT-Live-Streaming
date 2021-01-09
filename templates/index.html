@@ -13,7 +13,7 @@
         <script>
             (function(){
                 //let url = "https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd";
-                let url = "{{ url_for('static',filename='data/result_0_dash.mpd') }}";
+                let url = "{{ url_for('static',filename='data/result_dash.mpd') }}";
                 let player = dashjs.MediaPlayer().create();
                 player.initialize(document.querySelector("#videoPlayer"), url, true);
             })();

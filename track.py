@@ -90,32 +90,27 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
     selected_id = None
 
     # set video output writer
-    '''FFMPEG_BIN = 'ffmpeg.exe'
-    command = [FFMPEG_BIN,
-                '-y',
-                '-f', 'rawvideo',
-                '-vcodec', 'rawvideo',
-                '-s', f'{width}x{height}',
-                '-pix_fmt', 'rgb24',
-                '-r', '24',
-                '-i', '-'
-                '-an',
-                'vcodec', 'libx264',
-                'result.mp4']
-    pipe = sp.Popen(command, stdin=sp.PIPE, stderr=sp.PIPE)'''
+    is_tracked = False
     counter = 0
     encode = cv2.VideoWriter_fourcc(*'H264')
     encode = 0x00000021
-    output_video = cv2.VideoWriter( os.path.join(save_dir,f'result_{counter}.mp4'), encode, 5, (width, height), True)
+    output_video = cv2.VideoWriter( os.path.join(save_dir,f'result.mp4'), encode, 5, (width, height), True)
 
     # start tracking
     for path, img, img0 in dataloader:
         if frame_id % 100 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1./max(1e-5, timer.average_time)))
-            output_video.release()
+            #
             # Call MP4Box to divide new mp4 file
-            output_video = cv2.VideoWriter( os.path.join(save_dir,f'result_{counter}.mp4'), encode, 5, (width, height), True)
-            counter += 1
+            if is_tracked:
+                # Divide result.mp4 into segments and generate .mpd file
+                print('Generating mpd file...')
+                output_video.release()
+                cmd_str = 'MP4Box -dash 1000 -rap -profile dashavc264:live -bs-switching multi -segment-name result_ static/data/result.mp4 -out static/data/result_dash.mpd'
+                cmd_str = 'MP4Box -dash-live 1000 -frag 1000 -mpd-refresh 10000 -rap -profile dashavc264:live -bs-switching multi -segment-name result_ static/data/result.mp4 -out static/data/result_dash.mpd'
+                os.system(cmd_str)
+                output_video = cv2.VideoWriter( os.path.join(save_dir,f'result.mp4'), encode, 5, (width, height), True)
+            #counter += 1
 
         # run tracking
         timer.tic()
@@ -151,12 +146,13 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
         if save_dir is not None:
             cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frame_id)), online_im)
             output_video.write(online_im)
-            #pipe.proc.stdin.write(online_im.tostring())
+           
         frame_id += 1
+        is_tracked = True
     output_video.release()
-    #pipe.terminate()
+   
     # save results
-    write_results(result_filename, results, data_type)
+    # write_results(result_filename, results, data_type)
 
     return frame_id, timer.average_time, timer.calls
 

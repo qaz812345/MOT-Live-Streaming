@@ -4,6 +4,7 @@ import cv2
 import logging
 import argparse
 import motmetrics as mm
+import subprocess as sp
 
 import torch
 from tracker.multitracker import JDETracker
@@ -89,8 +90,22 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
     selected_id = None
 
     # set video output writer
+    '''FFMPEG_BIN = 'ffmpeg.exe'
+    command = [FFMPEG_BIN,
+                '-y',
+                '-f', 'rawvideo',
+                '-vcodec', 'rawvideo',
+                '-s', f'{width}x{height}',
+                '-pix_fmt', 'rgb24',
+                '-r', '24',
+                '-i', '-'
+                '-an',
+                'vcodec', 'libx264',
+                'result.mp4']
+    pipe = sp.Popen(command, stdin=sp.PIPE, stderr=sp.PIPE)'''
     counter = 0
     encode = cv2.VideoWriter_fourcc(*'H264')
+    encode = 0x00000021
     output_video = cv2.VideoWriter( os.path.join(save_dir,f'result_{counter}.mp4'), encode, 5, (width, height), True)
 
     # start tracking
@@ -136,8 +151,10 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
         if save_dir is not None:
             cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frame_id)), online_im)
             output_video.write(online_im)
+            #pipe.proc.stdin.write(online_im.tostring())
         frame_id += 1
     output_video.release()
+    #pipe.terminate()
     # save results
     write_results(result_filename, results, data_type)
 

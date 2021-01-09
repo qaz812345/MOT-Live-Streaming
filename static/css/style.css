@@ -4,13 +4,13 @@ body{
     overflow: hidden;
 }
 
-#player{
-    width: 720;
-    height: 640;
+#videoPlayer{
+    width: 640px;
+    height: 360px;
     vertical-align: middle;
 }
 
-#video_container{
+#videoContainer{
     width: 100%;
     display: flex;
     justify-content: center;

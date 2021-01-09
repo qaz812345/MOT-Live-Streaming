@@ -90,7 +90,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
 
     # set video output writer
     counter = 0
-    encode = cv2.VideoWriter_fourcc(*'mp4v')
+    encode = cv2.VideoWriter_fourcc(*'H264')
     output_video = cv2.VideoWriter( os.path.join(save_dir,f'result_{counter}.mp4'), encode, 5, (width, height), True)
 
     # start tracking

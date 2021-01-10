@@ -1,12 +1,14 @@
 import os
 import os.path as osp
 import cv2
+import time
+import torch
 import logging
 import argparse
+import ffmpeg_streaming
 import motmetrics as mm
 import subprocess as sp
-
-import torch
+from ffmpeg_streaming import Formats
 from tracker.multitracker import JDETracker
 from utils import visualization as vis
 from utils.log import logger
@@ -103,19 +105,26 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
             
             if is_tracked:
                 # Remove existed video file
-                if os.path.exists(os.path.join(save_dir, 'result.mp4')):
-                    cmd_str = f'del static\\data\\result.mp4'
+                if os.path.exists(os.path.join(save_dir, 'video.mp4')):
+                    cmd_str = f'del static\\data\\video.mp4'
                     os.system(cmd_str)
 
                 # Encode frames to video
                 print('Generating mp4 video...')
-                output_video_path = osp.join(save_dir, 'result.mp4')
+                output_video_path = osp.join(save_dir, 'video.mp4')
                 cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
                 os.system(cmd_str)
+                time.sleep(2)
 
                 # Divide result.mp4 into segments and generate .mpd file
                 print('Generating mpd file...')
-                cmd_str = 'MP4Box -dash 1000 -frag 1000 -mpd-refresh 7000 -rap -profile dashavc264:live -bs-switching multi -segment-name result_ static/data/result.mp4 -out static/data/result_dash.mpd'
+                #video = ffmpeg_streaming.input('static/data/result.mp4')
+                #dash = video.dash(Formats.h264())
+                #dash.auto_generate_representations()
+                #dash.output('static/data/result_dash.mpd')
+                cmd_str = f'del static\\data\\result*'
+                os.system(cmd_str)
+                cmd_str = 'MP4Box -dash 1000 -mpd-refresh 10000 -profile dashavc264:live -segment-name result_ static/data/video.mp4 -out static/data/result_dash.mpd'
                 os.system(cmd_str)
 
         # run tracking

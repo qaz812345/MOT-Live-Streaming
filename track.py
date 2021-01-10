@@ -89,28 +89,34 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
     global is_selected
     selected_id = None
 
-    # set video output writer
+    # initalize frame directory
+    cmd_str = f'rmdir /s /q static\\data\\frame'
+    os.system(cmd_str)
+    os.mkdir(f'static\\data\\frame')
+
     is_tracked = False
-    counter = 0
-    encode = cv2.VideoWriter_fourcc(*'H264')
-    encode = 0x00000021
-    output_video = cv2.VideoWriter( os.path.join(save_dir,f'result.mp4'), encode, 5, (width, height), True)
 
     # start tracking
     for path, img, img0 in dataloader:
-        if frame_id % 100 == 0:
+        if frame_id % 50 == 0:
             logger.info('Processing frame {} ({:.2f} fps)'.format(frame_id, 1./max(1e-5, timer.average_time)))
-            #
-            # Call MP4Box to divide new mp4 file
+            
             if is_tracked:
+                # Remove existed video file
+                if os.path.exists(os.path.join(save_dir, 'result.mp4')):
+                    cmd_str = f'del static\\data\\result.mp4'
+                    os.system(cmd_str)
+
+                # Encode frames to video
+                print('Generating mp4 video...')
+                output_video_path = osp.join(save_dir, 'result.mp4')
+                cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
+                os.system(cmd_str)
+
                 # Divide result.mp4 into segments and generate .mpd file
                 print('Generating mpd file...')
-                output_video.release()
-                cmd_str = 'MP4Box -dash 1000 -rap -profile dashavc264:live -bs-switching multi -segment-name result_ static/data/result.mp4 -out static/data/result_dash.mpd'
-                cmd_str = 'MP4Box -dash-live 1000 -frag 1000 -mpd-refresh 10000 -rap -profile dashavc264:live -bs-switching multi -segment-name result_ static/data/result.mp4 -out static/data/result_dash.mpd'
+                cmd_str = 'MP4Box -dash 1000 -frag 1000 -mpd-refresh 7000 -rap -profile dashavc264:live -bs-switching multi -segment-name result_ static/data/result.mp4 -out static/data/result_dash.mpd'
                 os.system(cmd_str)
-                output_video = cv2.VideoWriter( os.path.join(save_dir,f'result.mp4'), encode, 5, (width, height), True)
-            #counter += 1
 
         # run tracking
         timer.tic()
@@ -145,12 +151,11 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
             cv2.imshow('online_im', online_im)
         if save_dir is not None:
             cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frame_id)), online_im)
-            output_video.write(online_im)
+            #output_video.write(online_im)
            
         frame_id += 1
         is_tracked = True
-    output_video.release()
-   
+
     # save results
     # write_results(result_filename, results, data_type)
 

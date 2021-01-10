@@ -27,10 +27,11 @@ fragmented mp4 and a .mpd file
 * [cython_bbox](https://blog.csdn.net/qq_19707521/article/details/106692395)
 ### Others
 * [MP4Box](https://gpac.wp.imt.fr/downloads/)
+* ffmpeg
 
 ## Main Files
 * camera_tracking.py : load camera and track people
-* track.py : main code for tracking and saving frames
+* track.py : main for tracking, saving frames, and generating mpdfile
 * visualization.py : plot the tracked bboxs on frames
 * app.py : main for Flask
 
@@ -41,9 +42,11 @@ fragmented mp4 and a .mpd file
 * run flask, and access [127.0.0.1:5000](127.0.0.1:5000).
 ```Flask run```
 
-* generate mpd file
+* generate mpd file (sample example)
 ```MP4Box -dash 1000 -profile dashavc264:live -bs-switching multi <source.mp4>```
 
 ## Problems
 * The video output by ```cv2.VideoWriter_fourcc(*'MP4')``` is not supported by HTML. 
 + [Solution](https://stackoverflow.com/questions/49530857/python-opencv-video-format-play-in-browser): get OpenH264 library
+
+* Due to cache of Flask, mpd file will not update

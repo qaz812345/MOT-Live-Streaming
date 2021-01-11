@@ -22,12 +22,22 @@ class opt:
     nms_thres = 0.4
     min_box_area = 200
     track_buffer = 30
-    output_root = 'results'
+    output_root = 'static/data'
 
-@app.route('/')
+get_data = 0
+
+@app.route('/',methods=['GET','POST'])
 def index():
     # Get newest file path
-    return render_template("index.html")
+    global get_data
+    print("------index------")
+    if request.method =='POST':
+        if request.values['select_id']=='Selected':
+            get_data = request.form.get('tracking_id')
+            print("Select: ", get_data)
+            return render_template('index.html',name=request.values['tracking_id'])
+    
+    return render_template('index.html',name="")
 
 
 @app.route('/api/track')
@@ -61,18 +71,18 @@ def track():
 def test_page():
     data = [random.randrange(1, 10, 1) for i in range(7)]
     #data = get_online_ids()
-    data.insert(0,'All')
+    if data is not None:
+        data.insert(0,'All')
+    else:
+        data = ['All']
     print(data)
     #return str(datetime.datetime.now())  # 示範用
     return jsonify(data)
 
+
 @app.route('/get_select_id',methods=['GET','POST'])
 def get_select_id():
-    print("---get_select_id")
-    if request.method == 'POST':
-        get_data = request.json['id']
-        print(get_data)
-    
-        return jsonify(get_data) 
-    else: 
-        return render_template('index.html')
+    print("---get_select_id: ",get_data)
+    #get_data = request.form.get('tracking_id')
+    return str(get_data)
+

@@ -12,7 +12,7 @@ function fetch_from_server(){
 }
 
 function process_data(v){
-    document.getElementById('data').innerHTML = v;
+    //document.getElementById('data').innerHTML = v;
     selectArray = JSON.parse(v)
     var selectBox = document.getElementById('tracking_id');
     var index = selectBox.selectedIndex;
@@ -25,6 +25,7 @@ function process_data(v){
 
 function repeatedly_get(){
     fetch_from_server();
+    get_id();
     setTimeout(repeatedly_get, 5000);
 }
 
@@ -35,6 +36,18 @@ function track_start(){
     req.send();
 }
 
+function get_id(){
+    var req = new XMLHttpRequest();
+    req.open('GET', '/get_select_id');
+    req.onreadystatechange = function () {
+        if (req.readyState === 4) {
+          document.getElementById('pick').innerHTML = req.responseText;
+        }
+    };
+    req.send();
+}
+
+var pickID = 'All';
 /////////////////main//////////////////
 $(document).ready(function(){  
     
@@ -43,9 +56,24 @@ $(document).ready(function(){
     
     var selectBox = document.getElementById('tracking_id');
     document.getElementById('select_id').onclick = function () {
-        console.log(selectBox.value);
+        pickID = selectBox.value
+        console.log(pickID)
     }
-
+    
+    /*
+    $(function() {
+        $('form').submit(function() {
+            $.ajax({
+                type: 'POST',
+                url: "http://127.0.0.1:5000/get_select_id",
+                data: { id: $(this).tracking_id.value }
+            }).done(function(responce){
+                alert(responce);
+            });
+            return false;
+        }); 
+    })*/
+    /*
     $('#select_id').click(function(){
         var select_id = {
             "id" : selectBox.value
@@ -59,5 +87,5 @@ $(document).ready(function(){
             alert(responce);
         });
     })
-
+*/
 })

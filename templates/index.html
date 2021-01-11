@@ -3,6 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <title>HW4</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
         <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet" type="text/css">
         
     </head>
@@ -12,12 +13,15 @@
             <video id="videoPlayer" controls></video>
         </div>
 
-        <div>Select tracking ID：<span id="data"></span></div>
-        <div>
-            <select id="tracking_id">        
-            </select>
-            <form>
-                <button type="button" id="select_id">Selected</button>
+        <div id="selectform" align="center">
+            <!--<div>Select tracking ID：<span id="data"></span></div>-->
+            <br>
+            <div>Now Tracking At ID:<span id="pick"></span></div>
+            <br>
+            <form method="post">
+                <select class="selectpicker" id="tracking_id" name="tracking_id">        
+                </select>
+                <input type="submit" class="btn btn-secondary" id="select_id" name="select_id" value="Selected">
             </form>
         </div>
     </body>

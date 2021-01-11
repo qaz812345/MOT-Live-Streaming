@@ -7,7 +7,7 @@ from utils.utils import *
 from utils.log import logger
 from utils.timer import Timer
 from utils.parse_config import parse_model_cfg
-from track import eval_seq
+from track import eval_seq, get_online_ids
 from flask import Flask, render_template, jsonify,request
 import datetime
 import random
@@ -49,9 +49,8 @@ def track():
 
     try:
         # start tracking
-        frame_id, avg_time, calls, online_ids = eval_seq(opt, dataloader, 'mot', result_filename,
-                                                                    save_dir=result_root, show_image=True)
-        print(online_ids.insert(0,-1))
+        eval_seq(opt, dataloader, 'mot', result_filename,
+                save_dir=result_root, show_image=True)
         
     except Exception as e:
         logger.info(e)
@@ -61,6 +60,7 @@ def track():
 @app.route('/api/test')
 def test_page():
     data = [random.randrange(1, 10, 1) for i in range(7)]
+    #data = get_online_ids()
     data.insert(0,'All')
     print(data)
     #return str(datetime.datetime.now())  # 示範用

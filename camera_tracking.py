@@ -45,8 +45,10 @@ def track(opt):
 
     try:
         # start tracking
-        eval_seq(opt, dataloader, 'mot', result_filename,
-                 save_dir=result_root, show_image=True)
+        frame_id, avg_time, calls, online_ids = eval_seq(opt, dataloader, 'mot', result_filename,
+                                                save_dir=result_root, show_image=True)
+        print(online_ids.insert(0,-1))
+    
     except Exception as e:
         logger.info(e)
 

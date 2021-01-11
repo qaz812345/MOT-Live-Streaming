@@ -38,7 +38,7 @@ function track_start(){
 /////////////////main//////////////////
 $(document).ready(function(){  
     
-    track_start();
+    //track_start();
     repeatedly_get();
     
     var selectBox = document.getElementById('tracking_id');

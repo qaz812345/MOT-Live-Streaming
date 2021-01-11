@@ -20,18 +20,17 @@
                 <button type="button" id="select_id">Selected</button>
             </form>
         </div>
-        
-        <script>
-            (function(){
-                let url = "https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd";
-                //let url = "{{ url_for('static',filename='data/result_dash.mpd') }}";
-                let player = dashjs.MediaPlayer().create();
-                player.initialize(document.querySelector("#videoPlayer"), url, true);
-            })();
-        </script>
     </body>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script> 
     <script src="{{ url_for('static',filename='js/jquery.min.js') }}"></script>
     <script src="{{ url_for('static',filename='js/dash.all.min.js') }}"></script>
     <script src="{{ url_for('static',filename='js/client.js') }}"></script>
+    <script>
+        (function(){
+            //let url = "https://dash.akamaized.net/envivio/EnvivioDash3/manifest.mpd";
+            let url = "{{ url_for('static',filename='data/result_dash.mpd') }}";
+            let player = dashjs.MediaPlayer().create();
+            player.initialize(document.querySelector("#videoPlayer"), url, true);
+        })();
+    </script>
 </html>

@@ -62,6 +62,7 @@ def track():
 
 @app.route('/tracking_list',methods=['GET'])
 def tracking_list():
+    print("---tracking_list")
     #data = [random.randrange(1, 10, 1) for i in range(7)]
     data = get_online_ids()
     if data is not None:

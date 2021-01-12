@@ -114,7 +114,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
                 output_video_path = osp.join(save_dir, 'video.mp4')
                 cmd_str = 'ffmpeg -r 5 -f image2 -s 720x480 -i {}/%05d.jpg -vcodec libx264 -crf 25  -pix_fmt yuv420p {}'.format(osp.join(save_dir, 'frame'), output_video_path)
                 os.system(cmd_str)
-                time.sleep(2)
+                #time.sleep(1)
 
                 # Divide result.mp4 into segments and generate .mpd file
                 print('Generating mpd file...')
@@ -124,7 +124,8 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
                 #dash.output('static/data/result_dash.mpd')
                 cmd_str = f'del static\\data\\result*'
                 os.system(cmd_str)
-                cmd_str = 'MP4Box -dash 1000 -mpd-refresh 10000 -profile dashavc264:live -segment-name result_ static/data/video.mp4 -out static/data/result_dash.mpd'
+                #cmd_str = 'MP4Box -dash 10000 -frag 10000 -mpd-refresh 10 -rap -frag-rap -profile dashavc264:live -segment-name result_ static/data/video.mp4 -out static/data/result_dash.mpd'
+                cmd_str = 'MP4Box -dash-ctx static/data/dash-live.txt -dash 10000 -segment-timeline -rap -no-frags-default -bs-switching no -mpd-refresh 12 -min-buffer 50000 -time-shift 16 -url-template -segment-name result_ -out static/data/result_dash.mpd -dynamic static/data/video.mp4'
                 os.system(cmd_str)
 
         # run tracking

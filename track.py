@@ -20,7 +20,7 @@ from utils.utils import *
 
 click_pos = []
 is_selected = False
-
+now_ids = None
 def write_results(filename, results, data_type):
     if data_type == 'mot':
         save_format = '{frame},{id},{x1},{y1},{w},{h},1,-1,-1,-1\n'
@@ -89,6 +89,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
     # for selected object tracking 
     global click_pos
     global is_selected
+    global now_ids
     selected_id = None
 
     # initalize frame directory
@@ -145,6 +146,7 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
 
         # save results
         results.append((frame_id + 1, online_tlwhs, online_ids))
+        now_ids = online_ids
         if show_image or save_dir is not None:
             # get visualization result and some control flags for selected object tracking 
             online_im, click_pos, selected_id, is_selected = vis.plot_tracking(img0,
@@ -160,9 +162,10 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
             cv2.setMouseCallback("online_im", on_click)
             cv2.imshow('online_im', online_im)
         if save_dir is not None:
+            #print("======================",frime_id)
             cv2.imwrite(os.path.join(save_dir, 'frame', '{:05d}.jpg'.format(frame_id)), online_im)
             #output_video.write(online_im)
-           
+
         frame_id += 1
         is_tracked = True
 
@@ -171,6 +174,8 @@ def eval_seq(opt, dataloader, data_type, result_filename, save_dir=None, show_im
 
     return frame_id, timer.average_time, timer.calls
 
+def get_online_ids():
+    return now_ids
 
 def on_click(event, x, y,flags, param):
     '''

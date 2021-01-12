@@ -40,13 +40,15 @@ def track(opt):
 
     logger.info('Starting tracking...')
     # use camera to track
-    dataloader = datasets.LoadCamera(img_size=opt.img_size)
+    #dataloader = datasets.LoadCamera(img_size=opt.img_size)
+    dataloader = datasets.LoadVideo("./static/data/video01.mp4")
     result_filename = os.path.join(result_root, 'results.txt')
 
     try:
         # start tracking
         eval_seq(opt, dataloader, 'mot', result_filename,
-                 save_dir=result_root, show_image=True)
+            save_dir=result_root, show_image=True)
+    
     except Exception as e:
         logger.info(e)
 

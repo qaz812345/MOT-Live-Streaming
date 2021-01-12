@@ -13,6 +13,7 @@ import datetime
 import random
 
 app = Flask(__name__)
+get_data = 0
 
 class opt:
     cfg = 'cfg/yolov3_1088x608.cfg'
@@ -24,23 +25,15 @@ class opt:
     track_buffer = 30
     output_root = 'static/data'
 
-get_data = 0
 
-@app.route('/',methods=['GET','POST'])
+
+@app.route('/')
 def index():
     # Get newest file path
-    global get_data
-    print("------index------")
-    if request.method =='POST':
-        if request.values['select_id']=='Selected':
-            get_data = request.form.get('tracking_id')
-            print("Select: ", get_data)
-            return render_template('index.html',name=request.values['tracking_id'])
-    
     return render_template('index.html',name="")
 
 
-@app.route('/api/track')
+@app.route('/api/track',methods=['GET'])
 def track():
     # set saving dir
     print('================= start =================')
@@ -53,8 +46,8 @@ def track():
 
     logger.info('Starting tracking...')
     # use camera to track
-    dataloader = datasets.LoadCamera(img_size=opt.img_size)
-    #dataloader = datasets.LoadVideo("./static/data/video01.mp4")
+    #dataloader = datasets.LoadCamera(img_size=opt.img_size)
+    dataloader = datasets.LoadVideo("./static/data/video01.mp4")
     result_filename = os.path.join(result_root, 'results.txt')
 
     try:
@@ -67,10 +60,10 @@ def track():
 
     
 
-@app.route('/api/test')
-def test_page():
-    data = [random.randrange(1, 10, 1) for i in range(7)]
-    #data = get_online_ids()
+@app.route('/tracking_list',methods=['GET'])
+def tracking_list():
+    #data = [random.randrange(1, 10, 1) for i in range(7)]
+    data = get_online_ids()
     if data is not None:
         data.insert(0,'All')
     else:
@@ -82,7 +75,17 @@ def test_page():
 
 @app.route('/get_select_id',methods=['GET','POST'])
 def get_select_id():
-    print("---get_select_id: ",get_data)
-    #get_data = request.form.get('tracking_id')
-    return str(get_data)
+    global get_data
+    # send data to js
+    if request.method == 'GET':
+        print("---get_select_id: ",get_data)
+        return str(get_data)
+
+    # receive data from js and return 
+    elif request.method == 'POST':
+        print("---post_select_id: ", request.values['id'])
+        get_data = request.values['id']
+        if get_data is not 0:
+            return jsonify(dict(id=get_data,)), 201
+
 
